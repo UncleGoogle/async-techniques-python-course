@@ -12,13 +12,10 @@ def main():
 
     q = asyncio.Queue()
 
-    producers = [
-        generate_data(3, q),
-        generate_data(0.3, q),
-        generate_data(10, q),
-    ]
-    consumers_number = 1
-    consumers = [process_data(q) for i in range(consumers_number)]
+    consumers_no = 2
+    producers_no = 3
+    consumers = [process_data(q, throughput=1.4) for i in range(consumers_no)]
+    producers = [generate_data(q, rate=1.0) for i in range(producers_no)]
 
     [loop.create_task(job) for job in producers + consumers]
 
@@ -30,8 +27,10 @@ def main():
         print("| App exiting, total time: {:,.2f} sec.".format(dt))
 
 
-
-async def generate_data(rate: float, q: asyncio.Queue):
+async def generate_data(q: asyncio.Queue, rate: float = 1.0):
+    """
+    :param: items per second
+    """
     idx = 0
     while True:
         idx += 1
@@ -39,10 +38,10 @@ async def generate_data(rate: float, q: asyncio.Queue):
         await q.put((item, time.time()))
 
         print("-->> Generated item {}".format(idx))
-        await asyncio.sleep(random.random() + 1 / rate)
+        await asyncio.sleep(1 / rate)
 
 
-async def process_data(q: asyncio.Queue):
+async def process_data(q: asyncio.Queue, throughput: float = 1.0):
     while True:
         item = await q.get()
 
@@ -50,7 +49,7 @@ async def process_data(q: asyncio.Queue):
         dt = time.time() - t
 
         print("<< Processed value {} after {:,.2f} sec.".format(value, dt))
-        await asyncio.sleep(.5)
+        await asyncio.sleep(1 / throughput)
 
 
 if __name__ == '__main__':
