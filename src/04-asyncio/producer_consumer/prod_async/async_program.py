@@ -1,6 +1,5 @@
 import asyncio
 import time
-import random
 
 
 def main():
@@ -12,9 +11,9 @@ def main():
 
     q = asyncio.Queue()
 
-    consumers_no = 2
+    consumers_no = 1
     producers_no = 3
-    consumers = [process_data(q, throughput=1.4) for i in range(consumers_no)]
+    consumers = [process_data(q, throughput=3) for i in range(consumers_no)]
     producers = [generate_data(q, rate=1.0) for i in range(producers_no)]
 
     [loop.create_task(job) for job in producers + consumers]
