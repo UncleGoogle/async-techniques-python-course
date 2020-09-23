@@ -10,38 +10,46 @@ def main():
     t0 = time.time()
     print("| App started.", flush=True)
 
-    data = asyncio.Queue()
+    q = asyncio.Queue()
 
-    task1 = loop.create_task(generate_data(10, data))
-    task2 = loop.create_task(generate_data(8, data))
-    task3 = loop.create_task(process_data(40, data))
+    producers = [
+        generate_data(3, q),
+        generate_data(0.3, q),
+        generate_data(10, q),
+    ]
+    consumers_number = 1
+    consumers = [process_data(q) for i in range(consumers_number)]
 
-    final_task = asyncio.gather(task1, task2, task3)
-    loop.run_until_complete(final_task)
+    [loop.create_task(job) for job in producers + consumers]
 
-    dt = time.time() - t0
-    print("| App exiting, total time: {:,.2f} sec.".format(dt), flush=True)
+    try:
+        loop.run_forever()
+    except KeyboardInterrupt:
+        print('Exit on demand')
+        dt = time.time() - t0
+        print("| App exiting, total time: {:,.2f} sec.".format(dt))
 
 
-async def generate_data(num: int, data: asyncio.Queue):
-    for idx in range(1, num + 1):
+
+async def generate_data(rate: float, q: asyncio.Queue):
+    idx = 0
+    while True:
+        idx += 1
         item = idx*idx
-        await data.put((item, time.time()))
+        await q.put((item, time.time()))
 
-        print("-->> Generated item {}".format(idx), flush=True)
-        await asyncio.sleep(random.random() + .5)
+        print("-->> Generated item {}".format(idx))
+        await asyncio.sleep(random.random() + 1 / rate)
 
 
-async def process_data(num: int, data: asyncio.Queue):
-    processed = 0
-    while processed < num:
-        item = await data.get()
+async def process_data(q: asyncio.Queue):
+    while True:
+        item = await q.get()
 
-        processed += 1
         value, t = item
         dt = time.time() - t
 
-        print("<< Processed value {} after {:,.2f} sec.".format(value, dt), flush=True)
+        print("<< Processed value {} after {:,.2f} sec.".format(value, dt))
         await asyncio.sleep(.5)
 
 
