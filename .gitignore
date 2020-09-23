@@ -142,3 +142,6 @@ greeter.c
 math_core.c
 
 .idea/
+
+launch.json
+settings.json
