@@ -2,8 +2,10 @@
 Stopping single thread in Python is tricky.
 `threading` API has no method to stop a thread except killing all deamon threads at the end.
 Main reason is to not burden resources kept by a thread.
-So you can either use a system API (ex. ctypes) or any kind of signal (callback, threading.Event, gevent...) in your code to cleanup and finish thread job on your own.
-Check out different solutions in this tread: https://stackoverflow.com/questions/323972/is-there-any-way-to-kill-a-thread
+So you can either use a system API (ex. ctypes) or any kind of signal (callback, threading.Event, gevent...)
+in your code to cleanup and finish thread job on your own.
+Check out different solutions in this tread:
+https://stackoverflow.com/questions/323972/is-there-any-way-to-kill-a-thread
 
 Here, I'm implement one of the simplest solutions: callback-based signal to stop generating any data.
 """
