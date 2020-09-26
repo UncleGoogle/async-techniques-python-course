@@ -23,13 +23,11 @@ def main():
 
     stop_generate = False
 
-    generating_threads = [
+    threads = [
         threading.Thread(target=generate_data, args=(10, data, lambda: stop_generate), daemon=True),
         threading.Thread(target=generate_data, args=(20, data, lambda: stop_generate), daemon=True),
-        threading.Thread(target=generate_data, args=(30, data, lambda: stop_generate), daemon=True)
+        threading.Thread(target=process_all_data, args=(data,), daemon=True)
     ]
-    t3 = threading.Thread(target=process_all_data, args=(data,), daemon=True)
-    threads = generating_threads + [t3]
 
     abort_thread = threading.Thread(target=check_cancel, daemon=True)
     abort_thread.start()
@@ -43,7 +41,7 @@ def main():
             stop_generate = True
             break
 
-    t3.join()  # continue data processing till finish
+    [t.join() for t in threads]  # continue data processing till finish
 
     dt = datetime.datetime.now() - t0
     print(colorama.Fore.WHITE + "App exiting, total time: {:,.2f} sec.".format(dt.total_seconds()), flush=True)
@@ -81,7 +79,7 @@ def process_all_data(data: list):
 
         print(colorama.Fore.CYAN +
               " +++ Processed value {} after {:,.2f} sec.".format(value, dt.total_seconds()), flush=True)
-        time.sleep(.5)
+        time.sleep(1)
 
 
 if __name__ == '__main__':
