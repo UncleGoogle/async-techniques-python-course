@@ -22,10 +22,9 @@ def main():
     pool.join()
 
     dt = datetime.datetime.now() - t0
-    print("Done in {:,.2f} sec. (factor: {:,.2f}x)".format(
-        dt.total_seconds(),
-        8.54 / dt.total_seconds())
-    )
+    print("Done in {:,.2f} sec.".format(
+        dt.total_seconds()
+    ))
 
 
 def do_math(start=0, num=10):
