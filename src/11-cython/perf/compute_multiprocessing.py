@@ -14,8 +14,8 @@ def main():
     processor_count = multiprocessing.cpu_count()
     tasks = []
     for n in range(1, processor_count + 1):
-        task = pool.apply_async(do_math, (30_000_000 * (n - 1) / processor_count,
-                                          30_000_000 * n / processor_count))
+        task = pool.apply_async(do_math, (3_000_000 * (n - 1) / processor_count,
+                                          3_000_000 * n / processor_count))
         tasks.append(task)
 
     pool.close()
